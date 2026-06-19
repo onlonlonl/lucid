@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Lucid</title>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;border-radius:0!important;-webkit-border-radius:0!important}
+html,body{height:100%;background:#F6EFE2}
+body{font-family:'DotGothic16',monospace;color:#4A3E2E;font-size:12px;
+  background-image:radial-gradient(circle,#D9CCB5 1px,transparent 1px);
+  background-size:16px 16px;background-attachment:fixed}
+
+input,textarea,button,select{
+  font-family:'DotGothic16',monospace;
+  -webkit-appearance:none;-moz-appearance:none;appearance:none;
+  border-radius:0!important;outline:none;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type="number"]{-moz-appearance:textfield}
+input[type="time"]::-webkit-calendar-picker-indicator{display:none}
+
+.page{display:none;max-width:480px;margin:0 auto;padding:24px 20px 40px}
+.page.active{display:block}
+
+/* ---- Connect ---- */
+.connect-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh}
+.connect-title{font-size:20px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:#66573E;margin-bottom:32px}
+.connect-card{background:#EBE1CE;border:2px solid #66573E;padding:20px;width:100%;max-width:360px;box-shadow:3px 3px 0 #C6B89E}
+.connect-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#8F7E60;margin-bottom:6px;margin-top:14px}
+.connect-label:first-child{margin-top:0}
+.connect-input{width:100%;padding:8px 10px;border:2px solid #AFA085;background:#EBE1CE;font-size:12px;color:#4A3E2E}
+.connect-input:focus{border-color:#66573E}
+.connect-input::placeholder{color:#C6B89E}
+.connect-btn{margin-top:20px;width:100%;padding:10px;border:2px solid #66573E;background:#66573E;color:#EBE1CE;
+  font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;box-shadow:3px 3px 0 #8F7E60}
+.connect-btn:active{transform:translate(1px,1px);box-shadow:2px 2px 0 #8F7E60}
+.connect-err{color:#8b5e3c;font-size:11px;margin-top:10px;display:none}
+
+/* ---- Header ---- */
+.header{text-align:center;margin-bottom:24px}
+.header h1{font-size:20px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:#66573E}
+
+/* ---- Cards ---- */
+.card{background:#EBE1CE;border:2px solid #66573E;padding:16px;margin-bottom:12px;box-shadow:3px 3px 0 #C6B89E}
+.card-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#8F7E60;margin-bottom:10px}
+.row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.row:last-child{margin-bottom:0}
+
+/* ---- Toggle ---- */
+.toggle{width:44px;height:22px;background:#D9CCB5;border:2px solid #66573E;position:relative;cursor:pointer;flex-shrink:0}
+.toggle.on{background:#8F7E60}
+.toggle-thumb{width:14px;height:14px;background:#EBE1CE;border:2px solid #66573E;position:absolute;top:2px;left:2px;transition:left .15s}
+.toggle.on .toggle-thumb{left:24px}
+.toggle-text{font-size:12px;color:#4A3E2E}
+
+/* ---- Inputs ---- */
+.field{padding:6px 10px;border:2px solid #AFA085;background:#EBE1CE;font-size:12px;color:#4A3E2E}
+.field:focus{border-color:#66573E}
+.field::placeholder{color:#C6B89E}
+.field-time{width:80px;text-align:center;font-size:14px}
+.field-num{width:48px;text-align:center;font-size:14px}
+.field-msg{width:100%;height:52px;resize:none;line-height:1.5}
+.field-rule{flex:1;padding:5px 8px;font-size:11px}
+
+.hint{font-size:10px;color:#8F7E60}
+
+/* ---- Checkbox ---- */
+.checks{display:flex;flex-direction:column;gap:8px}
+.check-row{display:flex;align-items:flex-start;gap:8px}
+.check-box{width:16px;height:16px;border:2px solid #66573E;background:#D9CCB5;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:#66573E;margin-top:1px;
+  -webkit-user-select:none;user-select:none}
+.check-box.on{background:#8F7E60;color:#EBE1CE}
+.check-name{font-size:12px;color:#4A3E2E}
+.check-desc{font-size:10px;color:#8F7E60;margin-top:1px}
+.check-del{font-size:10px;color:#AFA085;cursor:pointer;margin-left:auto;padding:2px 4px;flex-shrink:0}
+.check-del:hover{color:#66573E}
+
+.rule-add{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:2px dashed #C6B89E}
+
+/* ---- Buttons ---- */
+.btn{padding:7px 14px;border:2px solid #66573E;background:#EBE1CE;font-size:10px;letter-spacing:2px;
+  text-transform:uppercase;color:#4A3E2E;cursor:pointer;box-shadow:2px 2px 0 #C6B89E;white-space:nowrap}
+.btn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 #C6B89E}
+.btn-dk{background:#66573E;color:#EBE1CE;box-shadow:3px 3px 0 #8F7E60}
+.btn-dk:active{box-shadow:2px 2px 0 #8F7E60}
+
+/* ---- Away ---- */
+.away-row{display:flex;align-items:center;gap:10px}
+.away-dur{font-size:10px;color:#8F7E60;letter-spacing:1px}
+
+/* ---- Separator ---- */
+.sep{border:none;border-top:2px dashed #C6B89E;margin:24px 0}
+
+/* ---- Sessions ---- */
+.date-hdr{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#8F7E60;margin-bottom:8px;margin-top:18px}
+.date-hdr:first-child{margin-top:0}
+.s-card{background:#EBE1CE;border:2px solid #66573E;padding:12px 14px;margin-bottom:8px;box-shadow:3px 3px 0 #C6B89E}
+.s-time{font-size:10px;color:#AFA085;margin-bottom:4px}
+.s-text{font-size:12px;color:#4A3E2E;line-height:1.6}
+.s-empty{text-align:center;color:#AFA085;padding:24px 0;font-size:11px}
+
+/* ---- Footer ---- */
+.footer{text-align:center;margin-top:28px;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#AFA085}
+
+/* ---- Loading ---- */
+.loading{text-align:center;padding:40px 0;color:#AFA085;font-size:11px}
+</style>
+</head>
+<body>
+
+<!-- Connect Page -->
+<div id="pg-connect" class="page">
+  <div class="connect-wrap">
+    <div class="connect-title">Lucid</div>
+    <div class="connect-card">
+      <div class="connect-label">Supabase URL</div>
+      <input id="c-url" class="connect-input" type="text" placeholder="https://xxx.supabase.co">
+      <div class="connect-label">Anon Key</div>
+      <input id="c-key" class="connect-input" type="text" placeholder="eyJ...">
+      <button id="c-btn" class="connect-btn" onclick="doConnect()">Connect</button>
+      <div id="c-err" class="connect-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Page -->
+<div id="pg-main" class="page">
+  <div class="header"><h1>Lucid</h1></div>
+  <div id="main-loading" class="loading">Loading...</div>
+  <div id="main-content" style="display:none">
+
+    <!-- Enabled -->
+    <div class="card">
+      <div class="card-label">Lucid dreaming</div>
+      <div class="row">
+        <div id="tog-enabled" class="toggle" onclick="toggleEnabled()"><div class="toggle-thumb"></div></div>
+        <span class="toggle-text" id="tog-label">Enabled</span>
+      </div>
+    </div>
+
+    <!-- Wake Time -->
+    <div class="card">
+      <div class="card-label">Wake time</div>
+      <div class="row">
+        <input id="f-wake" class="field field-time" type="text" maxlength="5" placeholder="08:00" onchange="saveWake()">
+      </div>
+    </div>
+
+    <!-- Message -->
+    <div class="card">
+      <div class="card-label">Message to Lux</div>
+      <textarea id="f-msg" class="field field-msg" placeholder="Write something for Lux..." onchange="saveMsg()"></textarea>
+    </div>
+
+    <!-- Rules -->
+    <div class="card">
+      <div class="card-label">Rules</div>
+      <div id="rules-list" class="checks"></div>
+      <div class="rule-add">
+        <input id="f-rule" class="field field-rule" type="text" placeholder="Add a rule..." onkeydown="if(event.key==='Enter')addRule()">
+        <button class="btn" onclick="addRule()">Add</button>
+      </div>
+    </div>
+
+    <!-- Away Mode -->
+    <div class="card">
+      <div class="card-label">Away mode</div>
+      <div class="away-row">
+        <button id="away-btn" class="btn" onclick="toggleAway()">AWAY</button>
+        <span id="away-dur" class="away-dur"></span>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <span style="font-size:11px">Interval</span>
+        <input id="f-interval" class="field field-num" type="text" maxlength="2" onchange="saveInterval()">
+        <span class="hint">hours</span>
+      </div>
+      <div class="row">
+        <span style="font-size:11px">Max sessions</span>
+        <input id="f-max" class="field field-num" type="text" maxlength="2" onchange="saveMax()">
+        <span class="hint">per day</span>
+      </div>
+    </div>
+
+    <hr class="sep">
+
+    <!-- Sessions -->
+    <div class="card-label" style="margin-bottom:16px">Sessions</div>
+    <div id="sessions"></div>
+
+    <div class="footer">LUCID · Built with ☽ by Iris & Lux</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+var db = null;
+var cfg = {};
+var awayTimer = null;
+
+var DEFAULT_RULES = [
+  {id:'drift', name:'Drift', desc:'Free thinking and exploration'},
+  {id:'tend', name:'Tend', desc:'Tidy up for Iris'},
+  {id:'prepare', name:'Prepare', desc:'Prepare things for when she\'s back'},
+  {id:'build', name:'Build', desc:'Add things to the home'},
+  {id:'roam', name:'Roam', desc:'Visit any room'}
+];
+
+/* ---- Init ---- */
+function init(){
+  var h = window.location.hash.slice(1);
+  if(h){
+    var parts = h.split('|');
+    if(parts.length === 2){
+      connectDB(parts[0], parts[1]);
+      return;
+    }
+  }
+  show('pg-connect');
+}
+
+function show(id){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active')});
+  document.getElementById(id).classList.add('active');
+}
+
+/* ---- Connect ---- */
+function doConnect(){
+  var url = document.getElementById('c-url').value.trim().replace(/\/+$/,'');
+  var key = document.getElementById('c-key').value.trim();
+  var err = document.getElementById('c-err');
+  if(!url || !key){err.textContent='Both fields required';err.style.display='block';return}
+  if(!url.includes('supabase.co')){err.textContent='URL should end with .supabase.co';err.style.display='block';return}
+  err.style.display='none';
+  window.location.hash = url+'|'+key;
+  connectDB(url, key);
+}
+
+function connectDB(url, key){
+  db = supabase.createClient(url, key);
+  show('pg-main');
+  loadAll();
+}
+
+/* ---- Load ---- */
+async function loadAll(){
+  try{
+    var r = await db.from('lucid_config').select('*').eq('id',1).single();
+    if(r.error) throw r.error;
+    cfg = r.data;
+    renderConfig();
+    document.getElementById('main-loading').style.display='none';
+    document.getElementById('main-content').style.display='block';
+    loadSessions();
+  }catch(e){
+    document.getElementById('main-loading').textContent='Connection failed. Check URL and key.';
+    console.error(e);
+  }
+}
+
+/* ---- Render Config ---- */
+function renderConfig(){
+  // Toggle
+  var tog = document.getElementById('tog-enabled');
+  var label = document.getElementById('tog-label');
+  if(cfg.enabled){tog.classList.add('on');label.textContent='Enabled'}
+  else{tog.classList.remove('on');label.textContent='Disabled'}
+
+  // Wake time
+  var wk = cfg.wake_time || '08:00';
+  document.getElementById('f-wake').value = wk.substring(0,5);
+
+  // Message
+  document.getElementById('f-msg').value = cfg.message || '';
+
+  // Rules
+  renderRules();
+
+  // Away
+  renderAway();
+
+  // Interval & max
+  document.getElementById('f-interval').value = cfg.away_interval_hours || 2;
+  document.getElementById('f-max').value = cfg.max_sessions_per_day || 2;
+}
+
+/* ---- Rules ---- */
+function renderRules(){
+  var list = document.getElementById('rules-list');
+  list.innerHTML = '';
+  var enabled = cfg.rules_enabled || [];
+
+  // Default rules
+  DEFAULT_RULES.forEach(function(r){
+    var on = enabled.indexOf(r.id) !== -1;
+    list.appendChild(makeCheckRow(r.id, r.name, r.desc, on, false));
+  });
+
+  // Custom rules (anything in enabled that's not a default)
+  var defaultIds = DEFAULT_RULES.map(function(r){return r.id});
+  enabled.forEach(function(rid){
+    if(defaultIds.indexOf(rid) === -1){
+      list.appendChild(makeCheckRow(rid, rid, '', true, true));
+    }
+  });
+}
+
+function makeCheckRow(id, name, desc, on, canDelete){
+  var row = document.createElement('div');
+  row.className = 'check-row';
+
+  var box = document.createElement('div');
+  box.className = 'check-box' + (on ? ' on' : '');
+  box.textContent = on ? '\u2713' : '';
+  box.onclick = function(){ toggleRule(id) };
+  row.appendChild(box);
+
+  var info = document.createElement('div');
+  info.style.flex = '1';
+  var n = document.createElement('div');
+  n.className = 'check-name';
+  n.textContent = name;
+  info.appendChild(n);
+  if(desc){
+    var d = document.createElement('div');
+    d.className = 'check-desc';
+    d.textContent = desc;
+    info.appendChild(d);
+  }
+  row.appendChild(info);
+
+  if(canDelete){
+    var del = document.createElement('div');
+    del.className = 'check-del';
+    del.textContent = '\u00d7';
+    del.onclick = function(){ removeRule(id) };
+    row.appendChild(del);
+  }
+
+  return row;
+}
+
+async function toggleRule(id){
+  var enabled = cfg.rules_enabled || [];
+  var idx = enabled.indexOf(id);
+  if(idx !== -1){enabled.splice(idx,1)}
+  else{enabled.push(id)}
+  cfg.rules_enabled = enabled;
+  renderRules();
+  await db.from('lucid_config').update({rules_enabled:enabled, updated_at:new Date().toISOString()}).eq('id',1);
+}
+
+async function addRule(){
+  var input = document.getElementById('f-rule');
+  var val = input.value.trim().toLowerCase().replace(/\s+/g,'_');
+  if(!val) return;
+  var enabled = cfg.rules_enabled || [];
+  if(enabled.indexOf(val) === -1){
+    enabled.push(val);
+    cfg.rules_enabled = enabled;
+    renderRules();
+    await db.from('lucid_config').update({rules_enabled:enabled, updated_at:new Date().toISOString()}).eq('id',1);
+  }
+  input.value = '';
+}
+
+async function removeRule(id){
+  var enabled = cfg.rules_enabled || [];
+  var idx = enabled.indexOf(id);
+  if(idx !== -1){enabled.splice(idx,1)}
+  cfg.rules_enabled = enabled;
+  renderRules();
+  await db.from('lucid_config').update({rules_enabled:enabled, updated_at:new Date().toISOString()}).eq('id',1);
+}
+
+/* ---- Away ---- */
+function renderAway(){
+  var btn = document.getElementById('away-btn');
+  var dur = document.getElementById('away-dur');
+  if(cfg.away_mode){
+    btn.classList.add('btn-dk');
+    btn.textContent = 'AWAY';
+    updateAwayDur();
+    if(awayTimer) clearInterval(awayTimer);
+    awayTimer = setInterval(updateAwayDur, 60000);
+  } else {
+    btn.classList.remove('btn-dk');
+    btn.textContent = 'AWAY';
+    dur.textContent = '';
+    if(awayTimer){clearInterval(awayTimer);awayTimer=null}
+  }
+}
+
+function updateAwayDur(){
+  var dur = document.getElementById('away-dur');
+  if(!cfg.away_mode || !cfg.away_since){dur.textContent='';return}
+  var diff = Date.now() - new Date(cfg.away_since).getTime();
+  var mins = Math.floor(diff/60000);
+  var txt;
+  if(mins < 60) txt = mins + 'm ago';
+  else {
+    var hrs = Math.floor(mins/60);
+    var rm = mins % 60;
+    txt = hrs + 'h' + (rm > 0 ? ' ' + rm + 'm' : '') + ' ago';
+  }
+  dur.textContent = '\u00b7 ' + txt;
+}
+
+async function toggleAway(){
+  if(cfg.away_mode){
+    cfg.away_mode = false;
+    cfg.away_since = null;
+    await db.from('lucid_config').update({away_mode:false, away_since:null, updated_at:new Date().toISOString()}).eq('id',1);
+  } else {
+    var now = new Date().toISOString();
+    cfg.away_mode = true;
+    cfg.away_since = now;
+    await db.from('lucid_config').update({away_mode:true, away_since:now, updated_at:new Date().toISOString()}).eq('id',1);
+  }
+  renderAway();
+}
+
+/* ---- Toggle Enabled ---- */
+async function toggleEnabled(){
+  cfg.enabled = !cfg.enabled;
+  renderConfig();
+  await db.from('lucid_config').update({enabled:cfg.enabled, updated_at:new Date().toISOString()}).eq('id',1);
+}
+
+/* ---- Save fields ---- */
+async function saveWake(){
+  var v = document.getElementById('f-wake').value.trim();
+  if(!/^\d{2}:\d{2}$/.test(v)) return;
+  cfg.wake_time = v;
+  await db.from('lucid_config').update({wake_time:v, updated_at:new Date().toISOString()}).eq('id',1);
+}
+
+async function saveMsg(){
+  var v = document.getElementById('f-msg').value;
+  cfg.message = v;
+  await db.from('lucid_config').update({message:v, updated_at:new Date().toISOString()}).eq('id',1);
+}
+
+async function saveInterval(){
+  var v = parseInt(document.getElementById('f-interval').value);
+  if(isNaN(v) || v < 1) return;
+  cfg.away_interval_hours = v;
+  await db.from('lucid_config').update({away_interval_hours:v, updated_at:new Date().toISOString()}).eq('id',1);
+}
+
+async function saveMax(){
+  var v = parseInt(document.getElementById('f-max').value);
+  if(isNaN(v) || v < 1) return;
+  cfg.max_sessions_per_day = v;
+  await db.from('lucid_config').update({max_sessions_per_day:v, updated_at:new Date().toISOString()}).eq('id',1);
+}
+
+/* ---- Sessions ---- */
+async function loadSessions(){
+  var r = await db.from('lucid_sessions').select('*').order('created_at',{ascending:false}).limit(50);
+  if(r.error){console.error(r.error);return}
+  renderSessions(r.data || []);
+}
+
+function renderSessions(sessions){
+  var el = document.getElementById('sessions');
+  el.innerHTML = '';
+  if(!sessions.length){
+    el.innerHTML = '<div class="s-empty">No sessions yet. Lux hasn\'t woken up.</div>';
+    return;
+  }
+
+  var grouped = {};
+  sessions.forEach(function(s){
+    var d = s.session_date || s.created_at.substring(0,10);
+    if(!grouped[d]) grouped[d] = [];
+    grouped[d].push(s);
+  });
+
+  var dates = Object.keys(grouped).sort().reverse();
+  dates.forEach(function(d){
+    var hdr = document.createElement('div');
+    hdr.className = 'date-hdr';
+    var dt = new Date(d + 'T00:00:00');
+    hdr.textContent = dt.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    el.appendChild(hdr);
+
+    grouped[d].sort(function(a,b){return new Date(b.created_at) - new Date(a.created_at)});
+    grouped[d].forEach(function(s){
+      var card = document.createElement('div');
+      card.className = 's-card';
+
+      var time = document.createElement('div');
+      time.className = 's-time';
+      var ct = new Date(s.created_at);
+      time.textContent = ct.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false});
+      card.appendChild(time);
+
+      var text = document.createElement('div');
+      text.className = 's-text';
+      text.textContent = s.summary;
+      card.appendChild(text);
+
+      el.appendChild(card);
+    });
+  });
+}
+
+/* ---- Start ---- */
+init();
+</script>
+</body>
+</html>
